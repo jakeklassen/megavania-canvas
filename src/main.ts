@@ -206,7 +206,7 @@ async function onload() {
 
   map = convertMapTextureToTilesArray(assets.map, 16, 16);
 
-  loop(performance.now());
+  requestAnimationFrame(loop);
 }
 
 window.onload = () => onload().catch(console.error);
