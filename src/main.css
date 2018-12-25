@@ -1,0 +1,32 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  /* overflow: hidden; */
+}
+
+#logs {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#container {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+}
+
+canvas {
+  margin: auto;
+  padding: 0;
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+}
+
+#gameCanvas {
+  background-color: black;
+}
