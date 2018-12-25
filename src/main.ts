@@ -100,35 +100,30 @@ resize();
 window.addEventListener('resize', resize);
 
 let dt = 0;
-let now;
-let last = performance.now();
+let last = 0;
 let isPaused = false;
 
-function loop(hrt: number) {
+function loop(hrt: DOMHighResTimeStamp) {
   if (ctx == null) {
     throw new Error('Canvas context2d lost');
   }
 
-  now = performance.now();
   // One additional note is that requestAnimationFrame might pause if our browser
   // loses focus, resulting in a very, very large dt after it resumes.
   // We can workaround this by limiting the delta to one second:
   // dt = dt + Math.min(1, (now - last) / 1000);
-  dt = now - last;
+  dt = (hrt - last) / 1000;
   frames.add(dt);
-
-  while (dt > step) {
-    dt = dt - step;
-  }
 
   megaman.vel.x = 0;
   megaman.vel.y = 0;
+
   if (controls.left.query()) {
     megaman.dir.x = -1;
-    megaman.vel.x = 200;
+    megaman.vel.x = 150;
   } else if (controls.right.query()) {
     megaman.dir.x = 1;
-    megaman.vel.x = 200;
+    megaman.vel.x = 150;
   }
 
   megaman.pos.x += megaman.dir.x * megaman.vel.x * dt;
@@ -155,8 +150,8 @@ function loop(hrt: number) {
         0,
         32,
         32,
-        megaman.pos.x,
-        megaman.pos.y,
+        Math.floor(megaman.pos.x),
+        Math.floor(megaman.pos.y),
         32,
         32,
       );
@@ -167,8 +162,8 @@ function loop(hrt: number) {
         0,
         32,
         32,
-        megaman.pos.x,
-        megaman.pos.y,
+        Math.floor(megaman.pos.x),
+        Math.floor(megaman.pos.y),
         32,
         32,
       );
@@ -178,12 +173,12 @@ function loop(hrt: number) {
     ctx.font = '10px Visitor';
 
     const averageFps =
-      1000 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
+      1 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
     ctx.fillText(String(Math.floor(averageFps)), 20, 10);
   } else {
   }
 
-  last = now;
+  last = hrt;
 
   requestAnimationFrame(loop);
 }
@@ -211,7 +206,7 @@ async function onload() {
 
   map = convertMapTextureToTilesArray(assets.map, 16, 16);
 
-  requestAnimationFrame(loop);
+  loop(performance.now());
 }
 
 window.onload = () => onload().catch(console.error);
