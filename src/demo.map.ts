@@ -1,12 +1,11 @@
+import { rectangleFactory, Rectangle } from './lib/collision/rectangle';
+
 export interface Tile {
   x: number;
   y: number;
   width: number;
   height: number;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
+  collider: Rectangle;
   rgba: string;
   visible: boolean;
 }
@@ -47,23 +46,15 @@ export const convertMapTextureToTilesArray = (
         continue;
       }
 
+      const posX = x * tileWidth;
+      const posY = y * tileHeight;
+
       row.push({
-        x: x * tileWidth,
-        y: y * tileHeight,
+        x: posX,
+        y: posY,
         width: tileWidth,
         height: tileHeight,
-        get left() {
-          return this.x;
-        },
-        get right() {
-          return this.x + this.width;
-        },
-        get top() {
-          return this.y;
-        },
-        get bottom() {
-          return this.y + this.height;
-        },
+        collider: rectangleFactory(posX, posY, tileWidth, tileHeight),
         rgba,
         visible: true,
       } as Tile);

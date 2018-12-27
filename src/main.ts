@@ -3,82 +3,72 @@ import megamanSheet from '../assets/images/megaman.png';
 import mapTexture from '../assets/images/map.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
 import { controls } from './lib/gamepad';
-import { convertMapTextureToTilesArray } from './demo.map';
+import { convertMapTextureToTilesArray, Tile } from './demo.map';
+import * as MainLoop from 'mainloop.js';
+import { get16x9Resolution } from './lib/screen';
+import { rectangleFactory } from './lib/collision/rectangle';
+import { intersects } from './lib/collision/aabb';
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 if (ctx == null) {
   throw new Error('Failed to obtain 2d rendering context');
 }
 
+const PPU = 16;
 const frames = new FixedSizeList<number>(10);
 const assets: { [key: string]: any } = {};
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 288;
 const minJumpHeight = 1;
-const maxJumpHeight = 3.5;
+const maxJumpHeight = 3 * PPU;
 const timeToJumpMin = 0.2;
 const timeToJumpApex = 0.4;
 const jumpCooldown = 0.15;
-const maxFallSpeed = 30;
+const maxFallSpeed = 30 * PPU;
 const gravity = 2 * maxJumpHeight / Math.pow(timeToJumpApex, 2);
-const jumpVelocity = -Math.abs(gravity) * timeToJumpApex;
-const fps = 60;
-const step = 1 / fps;
-
-let map = [[]];
-
-const megaman = {
-  sprite: Image,
-  pos: {
-    x: 0,
-    y: 0,
-  },
-  vel: {
-    x: 5,
-    y: 5,
-  },
-  dir: {
-    x: 1,
-    y: 1,
-  },
-};
+const jumpVelocity = -gravity * timeToJumpApex;
 
 ctx.imageSmoothingEnabled = false;
 canvas.style.width = `${GAME_WIDTH}px`;
 canvas.style.height = `${GAME_HEIGHT}px`;
 
-const get16x9Resolution = (
-  containerWidth: number,
-  containerHeight: number,
-  minWidth: number,
-  minHeight: number,
-) => {
-  if (containerWidth <= minWidth || containerHeight <= minHeight) {
-    return {
-      width: minWidth,
-      height: minHeight,
-    };
-  }
+let map: (Tile | null)[][];
 
-  let factor = 1;
-  let width = minWidth * factor;
-  let height = minHeight * factor;
+const megaman = {
+  sprite: {} as CanvasImageSource,
+  collider: rectangleFactory(150 + 12, 0 + 10, 11, 22),
+  airborne: false,
+  collisions: {
+    above: false,
+    below: false,
+    left: false,
+    right: false,
+  },
+  pos: {
+    x: 150,
+    y: 0,
+  },
+  vel: {
+    x: 0,
+    y: 0,
+  },
+  dir: {
+    x: 1,
+    y: 1,
+  },
+  timers: {
+    jump: 0,
+  },
+  move(pos: { x: number; y: number }) {
+    const { x, y } = pos;
+    this.pos.x += x;
+    this.pos.y += y;
 
-  while (width <= containerWidth && height <= containerHeight) {
-    factor++;
-
-    width = minWidth * factor;
-    height = minHeight * factor;
-  }
-
-  factor--;
-
-  return {
-    width: minWidth * factor,
-    height: minHeight * factor,
-  };
+    this.collider.x += x;
+    this.collider.y += y;
+  },
 };
 
 const resize = () => {
@@ -99,24 +89,18 @@ resize();
 
 window.addEventListener('resize', resize);
 
-let dt = 0;
-let last = 0;
-let isPaused = false;
+function update(delta: number) {
+  const dt = delta / 1000;
 
-function loop(hrt: DOMHighResTimeStamp) {
-  if (ctx == null) {
-    throw new Error('Canvas context2d lost');
-  }
-
-  // One additional note is that requestAnimationFrame might pause if our browser
-  // loses focus, resulting in a very, very large dt after it resumes.
-  // We can workaround this by limiting the delta to one second:
-  // dt = dt + Math.min(1, (now - last) / 1000);
-  dt = (hrt - last) / 1000;
   frames.add(dt);
 
   megaman.vel.x = 0;
-  megaman.vel.y = 0;
+  megaman.timers.jump += dt;
+
+  // Prepare velocities for collision checking
+  if (megaman.collisions.above || megaman.collisions.below) {
+    megaman.vel.y = 0;
+  }
 
   if (controls.left.query()) {
     megaman.dir.x = -1;
@@ -126,61 +110,200 @@ function loop(hrt: DOMHighResTimeStamp) {
     megaman.vel.x = 150;
   }
 
-  megaman.pos.x += megaman.dir.x * megaman.vel.x * dt;
-  megaman.pos.y += megaman.vel.y * dt;
+  if (
+    megaman.timers.jump >= jumpCooldown &&
+    controls.jump.query() &&
+    megaman.collisions.below &&
+    !megaman.collisions.above &&
+    !megaman.airborne
+  ) {
+    megaman.timers.jump = 0;
+    megaman.airborne = true;
+    megaman.vel.y = jumpVelocity;
+  }
 
-  if (isPaused === false) {
-    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  if (megaman.airborne && megaman.collisions.below) {
+    megaman.airborne = false;
+  }
 
-    ctx.fillStyle = 'green';
-    for (let y = 0; y < assets.map.height; ++y) {
-      for (let x = 0; x < assets.map.width; ++x) {
-        const tile = map[y][x];
+  megaman.vel.y += gravity * dt;
 
-        if (tile != null) {
-          ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
+  if (megaman.vel.y > maxFallSpeed) {
+    megaman.vel.y = maxFallSpeed;
+  }
+
+  const newX = megaman.dir.x * megaman.vel.x * dt;
+
+  megaman.collisions.left = false;
+  megaman.collisions.right = false;
+  megaman.collisions.above = false;
+  megaman.collisions.below = false;
+
+  // Move X
+
+  let collider = rectangleFactory(
+    megaman.pos.x + 12 + newX,
+    megaman.pos.y + 10,
+    11,
+    22,
+  );
+  let collisionX = false;
+
+  for (let y = 0; y < assets.map.height; ++y) {
+    for (let x = 0; x < assets.map.width; ++x) {
+      const tile = map[y][x];
+
+      if (tile != null) {
+        if (
+          tile.collider.bottom <= megaman.collider.top ||
+          tile.collider.top >= megaman.collider.bottom
+        ) {
+          continue;
+        }
+
+        if (intersects(collider, tile.collider)) {
+          collisionX = true;
+
+          if (megaman.dir.x > 0) {
+            megaman.collisions.right = true;
+
+            const adjust = tile.x - megaman.collider.right;
+            megaman.move({ x: adjust, y: 0 });
+          } else if (megaman.dir.x < 0) {
+            megaman.collisions.left = true;
+
+            const adjust = tile.collider.right - megaman.collider.x;
+            megaman.move({ x: adjust, y: 0 });
+          }
+
+          break;
         }
       }
     }
 
-    if (megaman.dir.x === 1) {
-      ctx.drawImage(
-        megaman.sprite,
-        0,
-        0,
-        32,
-        32,
-        Math.floor(megaman.pos.x),
-        Math.floor(megaman.pos.y),
-        32,
-        32,
-      );
-    } else {
-      ctx.drawImage(
-        megaman.sprite,
-        64,
-        0,
-        32,
-        32,
-        Math.floor(megaman.pos.x),
-        Math.floor(megaman.pos.y),
-        32,
-        32,
-      );
+    if (collisionX) {
+      break;
     }
-
-    ctx.fillStyle = 'white';
-    ctx.font = '10px Visitor';
-
-    const averageFps =
-      1 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
-    ctx.fillText(String(Math.floor(averageFps)), 20, 10);
-  } else {
   }
 
-  last = hrt;
+  if (collisionX === false) {
+    megaman.move({ x: newX, y: 0 });
+  }
 
-  requestAnimationFrame(loop);
+  // Move Y
+
+  const newY = megaman.vel.y * dt;
+
+  collider = rectangleFactory(
+    megaman.pos.x + 12,
+    megaman.pos.y + 10 + newY,
+    11,
+    22,
+  );
+  let collisionY = false;
+
+  for (let y = 0; y < assets.map.height; ++y) {
+    for (let x = 0; x < assets.map.width; ++x) {
+      const tile = map[y][x];
+
+      if (tile != null) {
+        if (intersects(collider, tile.collider)) {
+          collisionY = true;
+          megaman.vel.y = 0;
+
+          if (tile.collider.top < megaman.collider.top) {
+            megaman.collisions.above = true;
+
+            const adjust = tile.collider.bottom - megaman.collider.top;
+            megaman.move({ x: 0, y: adjust });
+          } else if (tile.collider.bottom > megaman.collider.bottom) {
+            megaman.collisions.below = true;
+
+            const adjust = tile.collider.top - megaman.collider.bottom;
+            megaman.move({ x: 0, y: adjust });
+          }
+
+          break;
+        }
+      }
+    }
+
+    if (collisionY) {
+      break;
+    }
+  }
+
+  if (collisionY === false) {
+    megaman.move({ x: 0, y: newY });
+  }
+
+  // megaman.move({
+  //   x: megaman.dir.x * megaman.vel.x * dt,
+  //   y: megaman.vel.y * gravity * dt,
+  // });
+
+  // megaman.move({
+  //   x: megaman.dir.x * megaman.vel.x * dt,
+  //   y: megaman.vel.y * dt,
+  // });
+  // megaman.pos.x += megaman.dir.x * megaman.vel.x * dt;
+  // megaman.pos.y += megaman.vel.y * dt;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+  ctx.fillStyle = 'green';
+  for (let y = 0; y < assets.map.height; ++y) {
+    for (let x = 0; x < assets.map.width; ++x) {
+      const tile = map[y][x];
+
+      if (tile != null) {
+        ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
+      }
+    }
+  }
+
+  if (megaman.dir.x === 1) {
+    ctx.drawImage(
+      megaman.sprite,
+      0,
+      0,
+      32,
+      32,
+      Math.round(megaman.pos.x),
+      Math.round(megaman.pos.y),
+      32,
+      32,
+    );
+  } else {
+    ctx.drawImage(
+      megaman.sprite,
+      64,
+      0,
+      32,
+      32,
+      Math.round(megaman.pos.x),
+      Math.round(megaman.pos.y),
+      32,
+      32,
+    );
+  }
+
+  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+  ctx.fillRect(
+    Math.round(megaman.collider.x),
+    Math.round(megaman.collider.y),
+    megaman.collider.width,
+    megaman.collider.height,
+  );
+
+  ctx.fillStyle = 'white';
+  ctx.font = '10px Visitor';
+
+  const averageFps =
+    1 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
+  ctx.fillText(String(Math.round(averageFps)), 20, 10);
 }
 
 async function onload() {
@@ -206,7 +329,9 @@ async function onload() {
 
   map = convertMapTextureToTilesArray(assets.map, 16, 16);
 
-  requestAnimationFrame(loop);
+  MainLoop.setUpdate(update)
+    .setDraw(draw)
+    .start();
 }
 
 window.onload = () => onload().catch(console.error);
