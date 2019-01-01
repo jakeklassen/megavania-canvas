@@ -11,7 +11,7 @@ export interface Tile {
 }
 
 export const convertMapTextureToTilesArray = (
-  texture: CanvasImageSource,
+  texture: ImageBitmap,
   tileWidth = 16,
   tileHeight = 16,
 ) => {

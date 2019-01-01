@@ -18,7 +18,11 @@ if (ctx == null) {
 
 const PPU = 16;
 const frames = new FixedSizeList<number>(10);
-const assets: { [key: string]: any } = {};
+const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
+  asset<T>(name: string) {
+    return assets[name] as T;
+  },
+};
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 288;
 const minJumpHeight = 1;
@@ -27,7 +31,7 @@ const timeToJumpMin = 0.2;
 const timeToJumpApex = 0.4;
 const jumpCooldown = 0.15;
 const maxFallSpeed = 30 * PPU;
-const gravity = 2 * maxJumpHeight / Math.pow(timeToJumpApex, 2);
+const gravity = (2 * maxJumpHeight) / Math.pow(timeToJumpApex, 2);
 const jumpVelocity = -gravity * timeToJumpApex;
 
 ctx.imageSmoothingEnabled = false;
@@ -37,7 +41,7 @@ canvas.style.height = `${GAME_HEIGHT}px`;
 let map: (Tile | null)[][];
 
 const megaman = {
-  sprite: {} as CanvasImageSource,
+  sprite: {} as ImageBitmap,
   collider: rectangleFactory(150 + 12, 0 + 10, 11, 22),
   airborne: false,
   collisions: {
@@ -311,19 +315,23 @@ async function onload() {
   const visitorFont = await font.load();
   document.fonts.add(visitorFont);
 
-  assets.megaman = await new Promise(resolve => {
+  let image: HTMLImageElement = await new Promise(resolve => {
     const image = new Image();
     image.onload = () => resolve(image);
 
     image.src = megamanSheet;
   });
 
-  assets.map = await new Promise(resolve => {
+  assets.megaman = await createImageBitmap(image);
+
+  let mapImage: HTMLImageElement = await new Promise(resolve => {
     const image = new Image();
     image.onload = () => resolve(image);
 
     image.src = mapTexture;
   });
+
+  assets.map = await createImageBitmap(mapImage);
 
   megaman.sprite = assets.megaman;
 
