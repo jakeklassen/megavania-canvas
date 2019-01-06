@@ -18,7 +18,7 @@
     "babel-preset-env": "^1.7.0",
     "parcel-bundler": "^1.11.0",
     "prettier": "^1.10.2",
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.3",
     "serve": "^10.1.1",
     "surge": "^0.20.1",
     "tslint": "^5.12.0",
