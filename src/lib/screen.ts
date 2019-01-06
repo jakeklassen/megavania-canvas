@@ -8,6 +8,7 @@ export const get16x9Resolution = (
     return {
       width: minWidth,
       height: minHeight,
+      factor: 1,
     };
   }
 
@@ -27,5 +28,6 @@ export const get16x9Resolution = (
   return {
     width: minWidth * factor,
     height: minHeight * factor,
+    factor,
   };
 };
