@@ -6,7 +6,7 @@
   "author": "Jake Klassen",
   "license": "MIT",
   "scripts": {
-    "repbuild": "rimraf dist",
+    "prepbuild": "rimraf dist",
     "build": "parcel build index.html",
     "deploy": "yarn run build && surge dist/ --domain megavania.surge.sh",
     "start": "parcel index.html"
