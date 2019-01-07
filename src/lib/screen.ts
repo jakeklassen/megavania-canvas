@@ -1,4 +1,4 @@
-export const get16x9Resolution = (
+export const getResolution = (
   containerWidth: number,
   containerHeight: number,
   minWidth: number,

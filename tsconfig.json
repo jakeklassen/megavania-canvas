@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "plugins": [{ "name": "typescript-tslint-plugin" }],
     "strict": true,
     "module": "commonjs",
     "target": "es2017",

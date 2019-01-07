@@ -22,7 +22,8 @@
     "serve": "^10.1.1",
     "surge": "^0.20.1",
     "tslint": "^5.12.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "typescript-tslint-plugin": "^0.2.1"
   },
   "dependencies": {
     "contro": "^2.1.2",

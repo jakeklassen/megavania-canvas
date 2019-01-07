@@ -1,13 +1,23 @@
 import { FixedSizeList } from 'fixed-size-list';
 import megamanSheet from '../assets/images/megaman.png';
+import nesSafeAreaImage from '../assets/images/nes_safe_area.png';
 import mapTexture from '../assets/images/map.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
 import { controls } from './lib/gamepad';
 import { convertMapTextureToTilesArray, Tile } from './demo.map';
 import * as MainLoop from 'mainloop.js';
-import { get16x9Resolution } from './lib/screen';
+import { getResolution } from './lib/screen';
 import { rectangleFactory } from './lib/collision/rectangle';
 import { intersects } from './lib/collision/aabb';
+
+function drawLine(
+  ctx: CanvasRenderingContext2D,
+  pixel: ImageData,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+) {}
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -16,6 +26,12 @@ if (ctx == null) {
   throw new Error('Failed to obtain 2d rendering context');
 }
 
+const redPixel = ctx.createImageData(1, 1);
+redPixel.data[0] = 255;
+redPixel.data[1] = 0;
+redPixel.data[2] = 0;
+redPixel.data[3] = 255;
+
 const PPU = 16;
 const frames = new FixedSizeList<number>(10);
 const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
@@ -23,8 +39,8 @@ const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
     return assets[name] as T;
   },
 };
-const GAME_WIDTH = 512;
-const GAME_HEIGHT = 288;
+const GAME_WIDTH = 256;
+const GAME_HEIGHT = 240;
 const minJumpHeight = 1;
 const maxJumpHeight = 3 * PPU;
 const timeToJumpMin = 0.2;
@@ -34,6 +50,8 @@ const maxFallSpeed = 30 * PPU;
 const gravity = (2 * maxJumpHeight) / Math.pow(timeToJumpApex, 2);
 const jumpVelocity = -gravity * timeToJumpApex;
 
+canvas.width = GAME_WIDTH;
+canvas.height = GAME_HEIGHT;
 ctx.imageSmoothingEnabled = false;
 canvas.style.width = `${GAME_WIDTH}px`;
 canvas.style.height = `${GAME_HEIGHT}px`;
@@ -78,15 +96,16 @@ const megaman = {
 const resize = () => {
   // Scale canvas to fit window while maintaining 16x9
   const { innerWidth, innerHeight } = window;
-  const { width, height } = get16x9Resolution(
+  const { width, height, factor } = getResolution(
     innerWidth,
     innerHeight,
     GAME_WIDTH,
     GAME_HEIGHT,
   );
 
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
+  // canvas.style.width = `${width}px`;
+  // canvas.style.height = `${height}px`;
+  canvas.style.transform = `scale(${factor})`;
 };
 
 resize();
@@ -302,6 +321,83 @@ function draw() {
     megaman.collider.height,
   );
 
+  ctx.globalAlpha = 0.5;
+  ctx.drawImage(assets.nesSafeArea, 0, 0);
+  ctx.globalAlpha = 1.0;
+
+  // ctx.putImageData(redPixel, 100, 100);
+
+  // ctx.lineWidth = 1;
+  // ctx.strokeStyle = 'rgba(255, 0, 0, 1)';
+  // ctx.strokeRect(-1, -1, 258, 8);
+  // ctx.strokeRect(-1, 232, 258, 232);
+
+  // ctx.strokeStyle = 'rgba(136, 136, 0, 1)';
+  // ctx.strokeRect(0, 8, 256, 232);
+
+  // ctx.lineCap = 'square';
+  // // Danger
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(255, 0, 0, 1.0)';
+  // ctx.moveTo(0, 0);
+  // ctx.lineTo(256, 0);
+  // ctx.stroke();
+
+  // ctx.moveTo(0, 240);
+  // ctx.lineTo(256, 240);
+  // ctx.stroke();
+  // ctx.closePath();
+
+  // Action
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(136, 136, 0, 1.0)';
+  // ctx.lineWidth = 8;
+  // ctx.moveTo(0, 12);
+  // ctx.lineTo(252, 12);
+  // ctx.lineTo(252, 228);
+  // ctx.lineTo(4, 228);
+  // ctx.lineTo(4, 12);
+  // ctx.stroke();
+  // ctx.closePath();
+
+  // // Safe
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(102, 102, 255, 1.0)';
+  // ctx.lineWidth = 8;
+  // ctx.moveTo(12, 20);
+  // ctx.lineTo(244, 20);
+  // ctx.lineTo(244, 224);
+  // ctx.stroke();
+  // ctx.closePath();
+
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(102, 102, 255, 1.0)';
+  // ctx.lineWidth = 12;
+  // ctx.moveTo(242, 222);
+  // ctx.lineTo(16, 222);
+  // ctx.stroke();
+  // ctx.closePath();
+
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(102, 102, 255, 1.0)';
+  // ctx.lineWidth = 8;
+  // ctx.moveTo(12, 224);
+  // ctx.lineTo(12, 20);
+  // ctx.stroke();
+  // ctx.closePath();
+
+  // Title
+  // ctx.beginPath();
+  // ctx.strokeStyle = 'rgba(102, 102, 102, 0.25)';
+  // ctx.lineWidth = 8;
+  // ctx.moveTo(20, 28);
+  // ctx.lineTo(236, 28);
+  // ctx.lineTo(236, 212);
+  // ctx.lineTo(20, 212);
+  // ctx.lineTo(20, 28);
+  // ctx.stroke();
+  // ctx.closePath();
+
   ctx.fillStyle = 'white';
   ctx.font = '10px Visitor';
 
@@ -323,6 +419,15 @@ async function onload() {
   });
 
   assets.megaman = await createImageBitmap(image);
+
+  image = await new Promise(resolve => {
+    const _image = new Image();
+    _image.onload = () => resolve(_image);
+
+    _image.src = nesSafeAreaImage;
+  });
+
+  assets.nesSafeArea = image;
 
   let mapImage: HTMLImageElement = await new Promise(resolve => {
     const image = new Image();
