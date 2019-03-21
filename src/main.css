@@ -29,4 +29,5 @@ canvas {
 
 #gameCanvas {
   background-color: grey;
+  position: absolute;
 }

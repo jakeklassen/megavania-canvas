@@ -1,4 +1,5 @@
 import { FixedSizeList } from 'fixed-size-list';
+import lerp from 'lerp';
 import megamanSheet from '../assets/images/megaman.png';
 import nesSafeAreaImage from '../assets/images/nes_safe_area.png';
 import mapTexture from '../assets/images/map.png';
@@ -72,6 +73,10 @@ const megaman = {
     x: 150,
     y: 0,
   },
+  lastPos: {
+    x: 150,
+    y: 0,
+  },
   vel: {
     x: 0,
     y: 0,
@@ -103,9 +108,9 @@ const resize = () => {
     GAME_HEIGHT,
   );
 
-  // canvas.style.width = `${width}px`;
-  // canvas.style.height = `${height}px`;
   canvas.style.transform = `scale(${factor})`;
+  canvas.style.left = `${innerWidth / 2 - canvas.width / 2}px`;
+  canvas.style.top = `${innerHeight / 2 - canvas.height / 2}px`;
 };
 
 resize();
@@ -117,6 +122,8 @@ function update(delta: number) {
 
   frames.add(dt);
 
+  megaman.lastPos.x = megaman.pos.x;
+  megaman.lastPos.y = megaman.pos.y;
   megaman.vel.x = 0;
   megaman.timers.jump += dt;
 
@@ -273,7 +280,7 @@ function update(delta: number) {
   // megaman.pos.y += megaman.vel.y * dt;
 }
 
-function draw() {
+function draw(interpolation: number) {
   ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
   ctx.fillStyle = 'green';
@@ -287,6 +294,11 @@ function draw() {
     }
   }
 
+  const megamanRenderPos = {
+    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation) | 0,
+    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation) | 0,
+  };
+
   if (megaman.dir.x === 1) {
     ctx.drawImage(
       megaman.sprite,
@@ -294,8 +306,8 @@ function draw() {
       0,
       32,
       32,
-      Math.round(megaman.pos.x),
-      Math.round(megaman.pos.y),
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
@@ -306,8 +318,8 @@ function draw() {
       0,
       32,
       32,
-      Math.round(megaman.pos.x),
-      Math.round(megaman.pos.y),
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
@@ -403,7 +415,10 @@ function draw() {
 
   const averageFps =
     1 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
-  ctx.fillText(String(Math.round(averageFps)), 20, 10);
+  ctx.fillText(String(averageFps.toFixed(2)), 20, 10);
+
+  ctx.fillText('FPS: ' + String(MainLoop.getFPS().toFixed(2)), 20, 20);
+  ctx.fillText('Interp: ' + String(interpolation.toFixed(2)), 20, 30);
 }
 
 async function onload() {
