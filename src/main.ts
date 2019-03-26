@@ -295,8 +295,8 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation) | 0,
-    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation) | 0,
+    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
+    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
   };
 
   if (megaman.dir.x === 1) {
@@ -326,12 +326,12 @@ function draw(interpolation: number) {
   }
 
   ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-  ctx.fillRect(
-    Math.round(megaman.collider.x),
-    Math.round(megaman.collider.y),
-    megaman.collider.width,
-    megaman.collider.height,
-  );
+  // ctx.fillRect(
+  //   Math.round(megaman.collider.x),
+  //   Math.round(megaman.collider.y),
+  //   megaman.collider.width,
+  //   megaman.collider.height,
+  // );
 
   ctx.globalAlpha = 0.5;
   ctx.drawImage(assets.nesSafeArea, 0, 0);
