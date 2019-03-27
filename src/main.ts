@@ -1,4 +1,3 @@
-import { FixedSizeList } from 'fixed-size-list';
 import lerp from 'lerp';
 import megamanSheet from '../assets/images/megaman.png';
 import nesSafeAreaImage from '../assets/images/nes_safe_area.png';
@@ -34,7 +33,6 @@ redPixel.data[2] = 0;
 redPixel.data[3] = 255;
 
 const PPU = 16;
-const frames = new FixedSizeList<number>(10);
 const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
   asset<T>(name: string) {
     return assets[name] as T;
@@ -119,8 +117,6 @@ window.addEventListener('resize', resize);
 
 function update(delta: number) {
   const dt = delta / 1000;
-
-  frames.add(dt);
 
   megaman.lastPos.x = megaman.pos.x;
   megaman.lastPos.y = megaman.pos.y;
@@ -412,10 +408,6 @@ function draw(interpolation: number) {
 
   ctx.fillStyle = 'white';
   ctx.font = '10px Visitor';
-
-  const averageFps =
-    1 / ([...frames].reduce((a, b) => a + b, 0) / frames.length);
-  ctx.fillText(String(averageFps.toFixed(2)), 20, 10);
 
   ctx.fillText('FPS: ' + String(MainLoop.getFPS().toFixed(2)), 20, 20);
   ctx.fillText('Interp: ' + String(interpolation.toFixed(2)), 20, 30);
