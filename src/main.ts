@@ -5,7 +5,7 @@ import mapTexture from '../assets/images/map.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
 import { controls } from './lib/gamepad';
 import { convertMapTextureToTilesArray, Tile } from './demo.map';
-import * as MainLoop from 'mainloop.js';
+import MainLoop from 'mainloop.js';
 import { getResolution } from './lib/screen';
 import { rectangleFactory } from './lib/collision/rectangle';
 import { intersects } from './lib/collision/aabb';
@@ -88,6 +88,7 @@ const megaman = {
   },
   move(pos: { x: number; y: number }) {
     const { x, y } = pos;
+
     this.pos.x += x;
     this.pos.y += y;
 
@@ -291,8 +292,10 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
-    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
+    // x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
+    // y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
+    x: megaman.lastPos.x + (megaman.pos.x - megaman.lastPos.x) * interpolation,
+    y: megaman.lastPos.y + (megaman.pos.y - megaman.lastPos.y) * interpolation,
   };
 
   if (megaman.dir.x === 1) {
