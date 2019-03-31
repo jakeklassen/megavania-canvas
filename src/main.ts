@@ -292,10 +292,10 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    // x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
-    // y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
-    x: megaman.lastPos.x + (megaman.pos.x - megaman.lastPos.x) * interpolation,
-    y: megaman.lastPos.y + (megaman.pos.y - megaman.lastPos.y) * interpolation,
+    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
+    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
+    // x: megaman.lastPos.x + (megaman.pos.x - megaman.lastPos.x) * interpolation,
+    // y: megaman.lastPos.y + (megaman.pos.y - megaman.lastPos.y) * interpolation,
   };
 
   if (megaman.dir.x === 1) {
