@@ -279,6 +279,7 @@ function update(delta: number) {
 
 function draw(interpolation: number) {
   ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  ctx.globalAlpha = 1;
 
   ctx.fillStyle = 'green';
   for (let y = 0; y < assets.map.height; ++y) {
@@ -292,10 +293,8 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
-    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
-    // x: megaman.lastPos.x + (megaman.pos.x - megaman.lastPos.x) * interpolation,
-    // y: megaman.lastPos.y + (megaman.pos.y - megaman.lastPos.y) * interpolation,
+    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation) | 0,
+    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation) | 0,
   };
 
   if (megaman.dir.x === 1) {
@@ -305,8 +304,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x | 0,
+      megaman.pos.y | 0,
       32,
       32,
     );
@@ -317,8 +316,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x | 0,
+      megaman.pos.y | 0,
       32,
       32,
     );
