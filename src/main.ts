@@ -46,8 +46,10 @@ const timeToJumpMin = 0.2;
 const timeToJumpApex = 0.4;
 const jumpCooldown = 0.15;
 const maxFallSpeed = 30 * PPU;
-const gravity = (2 * maxJumpHeight) / Math.pow(timeToJumpApex, 2);
+const gravity = Math.round((2 * maxJumpHeight) / Math.pow(timeToJumpApex, 2));
 const jumpVelocity = -gravity * timeToJumpApex;
+
+console.log({ gravity, jumpVelocity });
 
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
@@ -131,10 +133,10 @@ function update(delta: number) {
 
   if (controls.left.query()) {
     megaman.dir.x = -1;
-    megaman.vel.x = 150;
+    megaman.vel.x = 120;
   } else if (controls.right.query()) {
     megaman.dir.x = 1;
-    megaman.vel.x = 150;
+    megaman.vel.x = 120;
   }
 
   if (
@@ -293,8 +295,8 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation) | 0,
-    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation) | 0,
+    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
+    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
   };
 
   if (megaman.dir.x === 1) {
@@ -304,8 +306,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megaman.pos.x | 0,
-      megaman.pos.y | 0,
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
@@ -316,8 +318,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megaman.pos.x | 0,
-      megaman.pos.y | 0,
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
