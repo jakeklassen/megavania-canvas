@@ -134,9 +134,17 @@ function update(delta: number) {
   if (controls.left.query()) {
     megaman.dir.x = -1;
     megaman.vel.x = 120;
+
+    if (megaman.airborne) {
+      megaman.vel.x = 90;
+    }
   } else if (controls.right.query()) {
     megaman.dir.x = 1;
     megaman.vel.x = 120;
+
+    if (megaman.airborne) {
+      megaman.vel.x = 100;
+    }
   }
 
   if (
@@ -149,6 +157,7 @@ function update(delta: number) {
     megaman.timers.jump = 0;
     megaman.airborne = true;
     megaman.vel.y = jumpVelocity;
+    megaman.collisions.below = false;
   }
 
   if (megaman.airborne && megaman.collisions.below) {
@@ -161,8 +170,6 @@ function update(delta: number) {
     megaman.vel.y = maxFallSpeed;
   }
 
-  const newX = megaman.dir.x * megaman.vel.x * dt;
-
   megaman.collisions.left = false;
   megaman.collisions.right = false;
   megaman.collisions.above = false;
@@ -170,9 +177,11 @@ function update(delta: number) {
 
   // Move X
 
+  const newX = megaman.dir.x * megaman.vel.x * dt;
+
   let collider = rectangleFactory(
-    megaman.pos.x + 12 + newX,
-    megaman.pos.y + 10,
+    megaman.collider.x + newX,
+    megaman.collider.y,
     11,
     22,
   );
@@ -182,31 +191,34 @@ function update(delta: number) {
     for (let x = 0; x < assets.map.width; ++x) {
       const tile = map[y][x];
 
-      if (tile != null) {
-        if (
-          tile.collider.bottom <= megaman.collider.top ||
-          tile.collider.top >= megaman.collider.bottom
-        ) {
-          continue;
+      if (tile == null) {
+        continue;
+      }
+
+      // Skip tiles above or below the player
+      if (
+        tile.collider.bottom <= megaman.collider.top ||
+        tile.collider.top >= megaman.collider.bottom
+      ) {
+        continue;
+      }
+
+      if (intersects(collider, tile.collider)) {
+        collisionX = true;
+
+        if (megaman.dir.x > 0) {
+          megaman.collisions.right = true;
+
+          const adjust = tile.x - megaman.collider.right;
+          megaman.move({ x: adjust, y: 0 });
+        } else if (megaman.dir.x < 0) {
+          megaman.collisions.left = true;
+
+          const adjust = tile.collider.right - megaman.collider.x;
+          megaman.move({ x: adjust, y: 0 });
         }
 
-        if (intersects(collider, tile.collider)) {
-          collisionX = true;
-
-          if (megaman.dir.x > 0) {
-            megaman.collisions.right = true;
-
-            const adjust = tile.x - megaman.collider.right;
-            megaman.move({ x: adjust, y: 0 });
-          } else if (megaman.dir.x < 0) {
-            megaman.collisions.left = true;
-
-            const adjust = tile.collider.right - megaman.collider.x;
-            megaman.move({ x: adjust, y: 0 });
-          }
-
-          break;
-        }
+        break;
       }
     }
 
@@ -224,8 +236,8 @@ function update(delta: number) {
   const newY = megaman.vel.y * dt;
 
   collider = rectangleFactory(
-    megaman.pos.x + 12,
-    megaman.pos.y + 10 + newY,
+    megaman.collider.x,
+    megaman.collider.y + newY,
     11,
     22,
   );
@@ -235,25 +247,27 @@ function update(delta: number) {
     for (let x = 0; x < assets.map.width; ++x) {
       const tile = map[y][x];
 
-      if (tile != null) {
-        if (intersects(collider, tile.collider)) {
-          collisionY = true;
-          megaman.vel.y = 0;
+      if (tile == null) {
+        continue;
+      }
 
-          if (tile.collider.top < megaman.collider.top) {
-            megaman.collisions.above = true;
+      if (intersects(collider, tile.collider)) {
+        collisionY = true;
+        megaman.vel.y = 0;
 
-            const adjust = tile.collider.bottom - megaman.collider.top;
-            megaman.move({ x: 0, y: adjust });
-          } else if (tile.collider.bottom > megaman.collider.bottom) {
-            megaman.collisions.below = true;
+        if (tile.collider.top < megaman.collider.top) {
+          megaman.collisions.above = true;
 
-            const adjust = tile.collider.top - megaman.collider.bottom;
-            megaman.move({ x: 0, y: adjust });
-          }
+          const adjust = tile.collider.bottom - megaman.collider.top;
+          megaman.move({ x: 0, y: adjust });
+        } else if (tile.collider.bottom > megaman.collider.bottom) {
+          megaman.collisions.below = true;
 
-          break;
+          const adjust = tile.collider.top - megaman.collider.bottom;
+          megaman.move({ x: 0, y: adjust });
         }
+
+        break;
       }
     }
 
@@ -306,8 +320,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x,
+      megaman.pos.y,
       32,
       32,
     );
@@ -318,8 +332,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x,
+      megaman.pos.y,
       32,
       32,
     );
@@ -415,6 +429,7 @@ function draw(interpolation: number) {
 
   ctx.fillText('FPS: ' + String(MainLoop.getFPS().toFixed(2)), 20, 20);
   ctx.fillText('Interp: ' + String(interpolation.toFixed(2)), 20, 30);
+  ctx.fillText(`Airborne: ${megaman.airborne}`, 20, 40);
 }
 
 async function onload() {

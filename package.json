@@ -21,7 +21,7 @@
     "rimraf": "^2.6.3",
     "serve": "^10.1.2",
     "surge": "^0.20.3",
-    "tslint": "^5.14.0",
+    "tslint": "^5.15.0",
     "typescript": "^3.4.1",
     "typescript-tslint-plugin": "^0.3.1"
   },
