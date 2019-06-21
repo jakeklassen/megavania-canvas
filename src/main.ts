@@ -1,4 +1,3 @@
-import lerp from 'lerp';
 import megamanSheet from '../assets/images/megaman.png';
 import nesSafeAreaImage from '../assets/images/nes_safe_area.png';
 import mapTexture from '../assets/images/map.png';
@@ -17,7 +16,7 @@ function drawLine(
   y1: number,
   x2: number,
   y2: number,
-) {}
+) { }
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -136,7 +135,7 @@ function update(delta: number) {
     megaman.vel.x = 120;
 
     if (megaman.airborne) {
-      megaman.vel.x = 90;
+      megaman.vel.x = 100;
     }
   } else if (controls.right.query()) {
     megaman.dir.x = 1;
@@ -309,8 +308,8 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: lerp(megaman.lastPos.x, megaman.pos.x, interpolation),
-    y: lerp(megaman.lastPos.y, megaman.pos.y, interpolation),
+    x: parseInt(megaman.pos.x.toFixed(2), 10),
+    y: parseInt(megaman.pos.y.toFixed(2), 10),
   };
 
   if (megaman.dir.x === 1) {
@@ -320,8 +319,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megaman.pos.x,
-      megaman.pos.y,
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
@@ -332,8 +331,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megaman.pos.x,
-      megaman.pos.y,
+      megamanRenderPos.x,
+      megamanRenderPos.y,
       32,
       32,
     );
@@ -430,6 +429,8 @@ function draw(interpolation: number) {
   ctx.fillText('FPS: ' + String(MainLoop.getFPS().toFixed(2)), 20, 20);
   ctx.fillText('Interp: ' + String(interpolation.toFixed(2)), 20, 30);
   ctx.fillText(`Airborne: ${megaman.airborne}`, 20, 40);
+  ctx.fillText(`Pos: ${megaman.pos.x}, ${megaman.pos.y}`, 20, 50);
+  ctx.fillText(`Render Pos: ${megaman.pos.x | 0}, ${megaman.pos.y | 0}`, 20, 60);
 }
 
 async function onload() {
