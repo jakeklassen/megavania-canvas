@@ -16,7 +16,7 @@ function drawLine(
   y1: number,
   x2: number,
   y2: number,
-) { }
+) {}
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -123,6 +123,7 @@ function update(delta: number) {
   megaman.lastPos.x = megaman.pos.x;
   megaman.lastPos.y = megaman.pos.y;
   megaman.vel.x = 0;
+  megaman.vel.y = 0;
   megaman.timers.jump += dt;
 
   // Prepare velocities for collision checking
@@ -144,35 +145,41 @@ function update(delta: number) {
     if (megaman.airborne) {
       megaman.vel.x = 100;
     }
+  } else if (controls.up.query()) {
+    megaman.dir.y = -1;
+    megaman.vel.y = 100;
+  } else if (controls.down.query()) {
+    megaman.dir.y = 1;
+    megaman.vel.y = 100;
   }
 
-  if (
-    megaman.timers.jump >= jumpCooldown &&
-    controls.jump.query() &&
-    megaman.collisions.below &&
-    !megaman.collisions.above &&
-    !megaman.airborne
-  ) {
-    megaman.timers.jump = 0;
-    megaman.airborne = true;
-    megaman.vel.y = jumpVelocity;
-    megaman.collisions.below = false;
-  }
+  // if (
+  //   megaman.timers.jump >= jumpCooldown &&
+  //   controls.jump.query() &&
+  //   megaman.collisions.below &&
+  //   !megaman.collisions.above &&
+  //   !megaman.airborne
+  // ) {
+  //   megaman.timers.jump = 0;
+  //   megaman.airborne = true;
+  //   megaman.vel.y = jumpVelocity;
+  //   megaman.collisions.below = false;
+  // }
 
-  if (megaman.airborne && megaman.collisions.below) {
-    megaman.airborne = false;
-  }
+  // if (megaman.airborne && megaman.collisions.below) {
+  //   megaman.airborne = false;
+  // }
 
-  megaman.vel.y += gravity * dt;
+  // megaman.vel.y += gravity * dt;
 
-  if (megaman.vel.y > maxFallSpeed) {
-    megaman.vel.y = maxFallSpeed;
-  }
+  // if (megaman.vel.y > maxFallSpeed) {
+  //   megaman.vel.y = maxFallSpeed;
+  // }
 
-  megaman.collisions.left = false;
-  megaman.collisions.right = false;
-  megaman.collisions.above = false;
-  megaman.collisions.below = false;
+  // megaman.collisions.left = false;
+  // megaman.collisions.right = false;
+  // megaman.collisions.above = false;
+  // megaman.collisions.below = false;
 
   // Move X
 
@@ -186,45 +193,45 @@ function update(delta: number) {
   );
   let collisionX = false;
 
-  for (let y = 0; y < assets.map.height; ++y) {
-    for (let x = 0; x < assets.map.width; ++x) {
-      const tile = map[y][x];
+  // for (let y = 0; y < assets.map.height; ++y) {
+  //   for (let x = 0; x < assets.map.width; ++x) {
+  //     const tile = map[y][x];
 
-      if (tile == null) {
-        continue;
-      }
+  //     if (tile == null) {
+  //       continue;
+  //     }
 
-      // Skip tiles above or below the player
-      if (
-        tile.collider.bottom <= megaman.collider.top ||
-        tile.collider.top >= megaman.collider.bottom
-      ) {
-        continue;
-      }
+  //     // Skip tiles above or below the player
+  //     if (
+  //       tile.collider.bottom <= megaman.collider.top ||
+  //       tile.collider.top >= megaman.collider.bottom
+  //     ) {
+  //       continue;
+  //     }
 
-      if (intersects(collider, tile.collider)) {
-        collisionX = true;
+  //     if (intersects(collider, tile.collider)) {
+  //       collisionX = true;
 
-        if (megaman.dir.x > 0) {
-          megaman.collisions.right = true;
+  //       if (megaman.dir.x > 0) {
+  //         megaman.collisions.right = true;
 
-          const adjust = tile.x - megaman.collider.right;
-          megaman.move({ x: adjust, y: 0 });
-        } else if (megaman.dir.x < 0) {
-          megaman.collisions.left = true;
+  //         const adjust = tile.x - megaman.collider.right;
+  //         megaman.move({ x: adjust, y: 0 });
+  //       } else if (megaman.dir.x < 0) {
+  //         megaman.collisions.left = true;
 
-          const adjust = tile.collider.right - megaman.collider.x;
-          megaman.move({ x: adjust, y: 0 });
-        }
+  //         const adjust = tile.collider.right - megaman.collider.x;
+  //         megaman.move({ x: adjust, y: 0 });
+  //       }
 
-        break;
-      }
-    }
+  //       break;
+  //     }
+  //   }
 
-    if (collisionX) {
-      break;
-    }
-  }
+  //   if (collisionX) {
+  //     break;
+  //   }
+  // }
 
   if (collisionX === false) {
     megaman.move({ x: newX, y: 0 });
@@ -232,7 +239,7 @@ function update(delta: number) {
 
   // Move Y
 
-  const newY = megaman.vel.y * dt;
+  const newY = megaman.dir.y * megaman.vel.y * dt;
 
   collider = rectangleFactory(
     megaman.collider.x,
@@ -242,38 +249,38 @@ function update(delta: number) {
   );
   let collisionY = false;
 
-  for (let y = 0; y < assets.map.height; ++y) {
-    for (let x = 0; x < assets.map.width; ++x) {
-      const tile = map[y][x];
+  // for (let y = 0; y < assets.map.height; ++y) {
+  //   for (let x = 0; x < assets.map.width; ++x) {
+  //     const tile = map[y][x];
 
-      if (tile == null) {
-        continue;
-      }
+  //     if (tile == null) {
+  //       continue;
+  //     }
 
-      if (intersects(collider, tile.collider)) {
-        collisionY = true;
-        megaman.vel.y = 0;
+  //     if (intersects(collider, tile.collider)) {
+  //       collisionY = true;
+  //       megaman.vel.y = 0;
 
-        if (tile.collider.top < megaman.collider.top) {
-          megaman.collisions.above = true;
+  //       if (tile.collider.top < megaman.collider.top) {
+  //         megaman.collisions.above = true;
 
-          const adjust = tile.collider.bottom - megaman.collider.top;
-          megaman.move({ x: 0, y: adjust });
-        } else if (tile.collider.bottom > megaman.collider.bottom) {
-          megaman.collisions.below = true;
+  //         const adjust = tile.collider.bottom - megaman.collider.top;
+  //         megaman.move({ x: 0, y: adjust });
+  //       } else if (tile.collider.bottom > megaman.collider.bottom) {
+  //         megaman.collisions.below = true;
 
-          const adjust = tile.collider.top - megaman.collider.bottom;
-          megaman.move({ x: 0, y: adjust });
-        }
+  //         const adjust = tile.collider.top - megaman.collider.bottom;
+  //         megaman.move({ x: 0, y: adjust });
+  //       }
 
-        break;
-      }
-    }
+  //       break;
+  //     }
+  //   }
 
-    if (collisionY) {
-      break;
-    }
-  }
+  //   if (collisionY) {
+  //     break;
+  //   }
+  // }
 
   if (collisionY === false) {
     megaman.move({ x: 0, y: newY });
@@ -308,8 +315,8 @@ function draw(interpolation: number) {
   }
 
   const megamanRenderPos = {
-    x: parseInt(megaman.pos.x.toFixed(2), 10),
-    y: parseInt(megaman.pos.y.toFixed(2), 10),
+    x: (megaman.pos.x + 0.5) | 0,
+    y: (megaman.pos.y + 0.5) | 0,
   };
 
   if (megaman.dir.x === 1) {
@@ -319,8 +326,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x,
+      megaman.pos.y,
       32,
       32,
     );
@@ -331,8 +338,8 @@ function draw(interpolation: number) {
       0,
       32,
       32,
-      megamanRenderPos.x,
-      megamanRenderPos.y,
+      megaman.pos.x,
+      megaman.pos.y,
       32,
       32,
     );
@@ -430,7 +437,11 @@ function draw(interpolation: number) {
   ctx.fillText('Interp: ' + String(interpolation.toFixed(2)), 20, 30);
   ctx.fillText(`Airborne: ${megaman.airborne}`, 20, 40);
   ctx.fillText(`Pos: ${megaman.pos.x}, ${megaman.pos.y}`, 20, 50);
-  ctx.fillText(`Render Pos: ${megaman.pos.x | 0}, ${megaman.pos.y | 0}`, 20, 60);
+  ctx.fillText(
+    `Render Pos: ${megamanRenderPos.x}, ${megamanRenderPos.y}`,
+    20,
+    60,
+  );
 }
 
 async function onload() {
