@@ -1,6 +1,5 @@
 import megamanSheet from '../assets/images/megaman.png';
-import nesSafeAreaImage from '../assets/images/nes_safe_area.png';
-import mapTexture from '../assets/images/map.png';
+import mapTexture from '../assets/images/map-16x9.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
 import { controls } from './lib/gamepad';
 import { convertMapTextureToTilesArray, Tile } from './demo.map';
@@ -37,8 +36,8 @@ const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
     return assets[name] as T;
   },
 };
-const GAME_WIDTH = 256;
-const GAME_HEIGHT = 240;
+const GAME_WIDTH = 384;
+const GAME_HEIGHT = 216;
 const minJumpHeight = 1;
 const maxJumpHeight = 3 * PPU;
 const timeToJumpMin = 0.2;
@@ -329,8 +328,6 @@ function draw(interpolation: number) {
   //   megaman.collider.height,
   // );
 
-  ctx.globalAlpha = 0.5;
-  ctx.drawImage(assets.nesSafeArea, 0, 0);
   ctx.globalAlpha = 1.0;
 
   // ctx.putImageData(redPixel, 100, 100);
@@ -428,15 +425,6 @@ async function onload() {
   });
 
   assets.megaman = await createImageBitmap(image);
-
-  image = await new Promise(resolve => {
-    const _image = new Image();
-    _image.onload = () => resolve(_image);
-
-    _image.src = nesSafeAreaImage;
-  });
-
-  assets.nesSafeArea = image;
 
   let mapImage: HTMLImageElement = await new Promise(resolve => {
     const image = new Image();
