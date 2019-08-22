@@ -1,4 +1,3 @@
-
 export const getResolution = (
   containerWidth: number,
   containerHeight: number,
@@ -14,7 +13,6 @@ export const getResolution = (
       factor: 1,
     };
   }
-
 
   // If the container is the exact aspect ratio of the original resolution,
   // return a factor that reflects that.

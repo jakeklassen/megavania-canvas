@@ -1,3 +1,4 @@
+import { World } from '@jakeklassen/ecs';
 import megamanSheet from '../assets/images/megaman.png';
 import mapTexture from '../assets/images/map-16x9.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
@@ -7,15 +8,10 @@ import MainLoop from 'mainloop.js';
 import { getResolution } from './lib/screen';
 import { rectangleFactory } from './lib/collision/rectangle';
 import { intersects } from './lib/collision/aabb';
-
-function drawLine(
-  ctx: CanvasRenderingContext2D,
-  pixel: ImageData,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-) { }
+import { PlayerTag } from './components/PlayerTag';
+import { Transform2d } from './components/Transform2d';
+import { Vector2d } from './lib/vector2d';
+import { BoxCollider2d } from './components/BoxCollider2d';
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -56,6 +52,18 @@ canvas.style.width = `${GAME_WIDTH}px`;
 canvas.style.height = `${GAME_HEIGHT}px`;
 
 let map: (Tile | null)[][];
+
+// ECS
+
+const world = new World();
+
+const player = world.createEntity();
+world.addEntityComponents(
+  player,
+  new PlayerTag(),
+  new Transform2d(new Vector2d(150, 0)),
+  new BoxCollider2d(150 + 12, 0 + 10, 11, 22),
+);
 
 const megaman = {
   sprite: {} as ImageBitmap,
