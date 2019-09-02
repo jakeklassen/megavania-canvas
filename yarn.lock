@@ -747,10 +747,10 @@
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.1.tgz#82d0993d8882bb05e0645fbb4731d9e939e895b3"
   integrity sha512-I2EjI9TbEFJNLziNPFfpo64PNanOaK17iL2kTW/jGlGOa4bvHw4VEied83kOEB7NJjXf1KfvmsQ2aEjy3xjiGg==
 
-"@jakeklassen/ecs@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-2.1.1.tgz#77999b4277ec97420bb95a1e082693ccb564a083"
-  integrity sha512-bgQY8IxL8VyWKpLMechyVMiAc8dK5WlBuMbtUJiVIeT/oyW9U9TiGMr5Svby8M8Cz89wtyjeLGiog2AIMu0qbA==
+"@jakeklassen/ecs@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-2.3.0.tgz#b21dbebac5fc1382ef67292f08d1880645a538f8"
+  integrity sha512-i+RuanCzMWycHuUMRmZzgk1kUCz6dQ9MaDMlp7NxfGTgqvQJjx0XDD509IsmNYRRkohk1seBYZCi2T/WuqnORQ==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -806,10 +806,10 @@
     "@parcel/utils" "^1.11.0"
     physical-cpu-count "^2.0.0"
 
-"@types/lodash@^4.14.137":
-  version "4.14.137"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.137.tgz#8a4804937dc6462274ffcc088df8f14fc1b368e2"
-  integrity sha512-g4rNK5SRKloO+sUGbuO7aPtwbwzMgjK+bm9BBhLD7jGUiGR7zhwYEhSln/ihgYQBeIJ5j7xjyaYzrWTcu3UotQ==
+"@types/lodash@^4.14.138":
+  version "4.14.138"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.138.tgz#34f52640d7358230308344e579c15b378d91989e"
+  integrity sha512-A4uJgHz4hakwNBdHNPdxOTkYmXNgmUAKLbXZ7PKGslgeV0Mb8P3BlbYfPovExek1qnod4pDfRbxuzcVs3dlFLg==
 
 "@types/mainloop.js@^1.0.5":
   version "1.0.5"
@@ -6562,10 +6562,10 @@ typescript-tslint-plugin@^0.5.4:
     mock-require "^3.0.2"
     vscode-languageserver "^5.1.0"
 
-typescript@^3.5.3:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
-  integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
+typescript@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.6.2.tgz#105b0f1934119dde543ac8eb71af3a91009efe54"
+  integrity sha512-lmQ4L+J6mnu3xweP8+rOrUwzmN+MRAj7TgtJtDaXE5PMyX2kCrklhg3rvOsOIfNeAWMQWO2F1GPc1kMD2vLAfw==
 
 uncss@^0.16.2:
   version "0.16.2"

@@ -12,7 +12,7 @@
     "start": "parcel index.html"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.137",
+    "@types/lodash": "^4.14.138",
     "@types/mainloop.js": "^1.0.5",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
@@ -22,11 +22,11 @@
     "serve": "^11.1.0",
     "surge": "^0.21.3",
     "tslint": "^5.19.0",
-    "typescript": "^3.5.3",
+    "typescript": "^3.6.2",
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
-    "@jakeklassen/ecs": "^2.1.1",
+    "@jakeklassen/ecs": "^2.3.0",
     "contro": "^2.1.2",
     "fixed-size-list": "^0.1.5",
     "lerp": "^1.0.3",
