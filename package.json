@@ -12,24 +12,24 @@
     "start": "parcel index.html"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.123",
+    "@types/lodash": "^4.14.146",
     "@types/mainloop.js": "^1.0.5",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
-    "parcel-bundler": "^1.12.3",
-    "prettier": "^1.16.4",
-    "rimraf": "^2.6.3",
-    "serve": "^11.0.2",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^1.19.0",
+    "rimraf": "^3.0.0",
+    "serve": "^11.2.0",
     "surge": "^0.21.3",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4.1",
-    "typescript-tslint-plugin": "^0.5.0"
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2",
+    "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
     "contro": "^2.1.2",
-    "fixed-size-list": "^0.1.5",
+    "fixed-size-list": "^0.3.0",
     "lerp": "^1.0.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "mainloop.js": "^1.0.4"
   }
 }
