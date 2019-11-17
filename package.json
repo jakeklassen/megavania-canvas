@@ -12,18 +12,18 @@
     "start": "parcel index.html"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.146",
+    "@types/lodash": "^4.14.148",
     "@types/mainloop.js": "^1.0.5",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "parcel-bundler": "^1.12.4",
-    "prettier": "^1.19.0",
+    "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "serve": "^11.2.0",
     "surge": "^0.21.3",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2",
-    "typescript-tslint-plugin": "^0.5.4"
+    "typescript-tslint-plugin": "^0.5.5"
   },
   "dependencies": {
     "contro": "^2.1.2",
