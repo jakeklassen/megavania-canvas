@@ -2,34 +2,28 @@
   "name": "web-megavania",
   "version": "1.0.0",
   "description": "Megavania web game",
-  "main": "index.js",
+  "type": "module",
   "author": "Jake Klassen",
   "license": "MIT",
   "scripts": {
-    "prepbuild": "rimraf dist",
-    "build": "parcel build index.html",
-    "deploy": "yarn run build && surge dist/ --domain megavania.surge.sh",
-    "start": "parcel index.html"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "deploy": "pnpm run build && surge dist/ --domain megavania.surge.sh"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.148",
+    "@types/lodash": "^4.17.24",
     "@types/mainloop.js": "^1.0.5",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "parcel-bundler": "^1.12.4",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.0",
-    "serve": "^11.2.0",
-    "surge": "^0.21.3",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.2",
-    "typescript-tslint-plugin": "^0.5.5"
+    "prettier": "^3.8.4",
+    "surge": "^0.27.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0"
   },
   "dependencies": {
     "contro": "^2.1.2",
     "fixed-size-list": "^0.3.0",
     "lerp": "^1.0.3",
-    "lodash": "^4.17.19",
+    "lodash": "^4.18.1",
     "mainloop.js": "^1.0.4"
   }
 }

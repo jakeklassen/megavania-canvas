@@ -1,4 +1,2 @@
-onlyBuiltDependencies:
-  - core-js
-  - deasync
-  - parcel-bundler
+allowBuilds:
+  esbuild: true

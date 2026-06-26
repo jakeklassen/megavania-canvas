@@ -1,5 +1,4 @@
-declare module '*.png';
-declare module '*.ttf';
+/// <reference types="vite/client" />
 
 declare module 'contro';
 

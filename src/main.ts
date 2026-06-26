@@ -1,3 +1,4 @@
+import './main.css';
 import megamanSheet from '../assets/images/megaman.png';
 import mapTexture from '../assets/images/map-16x9.png';
 import visitorFontUrl from '../assets/fonts/visitor/visitor1.ttf';
@@ -15,7 +16,7 @@ function drawLine(
   y1: number,
   x2: number,
   y2: number,
-) { }
+) {}
 
 const canvas = document.querySelector('#gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -30,7 +31,6 @@ redPixel.data[1] = 0;
 redPixel.data[2] = 0;
 redPixel.data[3] = 255;
 
-const PPU = 16;
 const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
   asset<T>(name: string) {
     return assets[name] as T;
@@ -39,8 +39,10 @@ const assets: { [key: string]: any; asset<T>(name: string): () => T } = {
 const GAME_WIDTH = 384;
 const GAME_HEIGHT = 216;
 const minJumpHeight = 1;
-const maxJumpHeight = 3 * PPU;
 const timeToJumpMin = 0.2;
+// Pixels Per Unit
+const PPU = 16;
+const maxJumpHeight = 3 * PPU;
 const timeToJumpApex = 0.4;
 const jumpCooldown = 0.15;
 const maxFallSpeed = 30 * PPU;

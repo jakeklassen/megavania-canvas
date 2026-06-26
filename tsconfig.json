@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "plugins": [{ "name": "typescript-tslint-plugin" }],
     "strict": true,
-    "module": "commonjs",
-    "target": "es2017",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020",
     "esModuleInterop": true,
-    "lib": ["dom", "es2017"]
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src", "vite.config.ts"]
 }
